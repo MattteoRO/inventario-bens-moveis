@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário de Bens Móveis 2024</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .tabs {
+            margin-top: 20px;
+            display: flex;
+        }
+        .tab {
+            position: relative;
+            cursor: pointer;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            background-color: #e9ecef;
+            flex: 1;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .tab:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+        .tab-content {
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+        table th, table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Inventário de Bens Móveis 2024</h1>
+    </div>
+
+    <div class="container my-4">
+        <div class="d-flex tabs">
+            <div class="tab active flex-fill" onclick="openTab('responsabilidade')">
+                Bens Sob Minha Responsabilidade
+            </div>
+            <div class="tab flex-fill" onclick="openTab('outroSetor')">
+                Bens de Outro Setor
+            </div>
+            <div class="tab flex-fill" onclick="openTab('semTombo')">
+                Bens Sem Tombo
+            </div>
+        </div>
+
+        <div id="responsabilidade" class="tab-content">
+            <h2>Bens Sob Minha Responsabilidade</h2>
+
+            <form id="formResponsabilidade" class="row g-3 my-3" onsubmit="return buscarTombo();">
+                <div class="col-md-4">
+                    <input type="text" id="buscaBem" class="form-control" placeholder="Buscar Tombo" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" id="buscaServidor" class="form-control" placeholder="Buscar Servidor" onkeyup="filtrarPorServidor()">
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Buscar Bem</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table id="tableResponsabilidade" class="table table-striped table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Responsável</th>
+                            <th>Tombo</th>
+                            <th>Descrição</th>
+                            <th>Característica</th>
+                            <th>Situação do Bem</th>
+                            <th>Marca/Modelo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Resultados da Busca</h3>
+            <div id="resultadosBusca" class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Responsável</th>
+                            <th>Tombo</th>
+                            <th>Descrição</th>
+                            <th>Característica</th>
+                            <th>Situação do Bem</th>
+                            <th>Marca/Modelo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyResultados">
+                        <!-- Resultados da busca serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="outroSetor" class="tab-content d-none">
+            <h2>Bens de Outro Setor</h2>
+            <div class="table-responsive">
+                <table id="tableOutroSetor" class="table table-striped table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Responsável</th>
+                            <th>Tombo</th>
+                            <th>Descrição</th>
+                            <th>Característica</th>
+                            <th>Situação do Bem</th>
+                            <th>Marca/Modelo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="semTombo" class="tab-content d-none">
+            <h2>Bens Sem Tombo</h2>
+            <div class="table-responsive">
+                <table id="tableSemTombo" class="table table-striped table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Responsável</th>
+                            <th>Tombo</th>
+                            <th>Descrição</th>
+                            <th>Característica</th>
+                            <th>Situação do Bem</th>
+                            <th>Marca/Modelo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lista de bens (substitua com os dados reais da sua planilha)
+        const bens = [
+            { responsavel: "MATEUS DA SILVA CAMPOS", tombo: "123", descricao: "Computador", caracteristica: "Dell", situacao: "Bom", marcaModelo: "XPS 15" },
+            { responsavel: "JORGE LUIZ HERACLITO DE MATTOS", tombo: "456", descricao: "Projetor", caracteristica: "Epson", situacao: "Regular", marcaModelo: "EB-X41" },
+            { responsavel: "ANNA PAULA", tombo: "789", descricao: "Impressora", caracteristica: "HP", situacao: "Bom", marcaModelo: "LaserJet" },
+            // Adicionando servidores conforme solicitado
+            { responsavel: "Ademar Silva Scheidt Júnior", tombo: "001", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Ana Lucy Caproni", tombo: "002", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Ariel Argobe da Costa Brasil", tombo: "003", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Avany Aparecida Garcia", tombo: "004", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Carlos Barroso De Oliveira Junior", tombo: "005", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Celielson de Aguiar Brito", tombo: "006", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Dayanne Cavalcante Saldanha", tombo: "007", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Dorosnil Alves Moreira", tombo: "008", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Edinéia Bento de Souza Fernandes", tombo: "009", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Elainy Da Silva Camilo Loiola", tombo: "010", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Elisabet Cristina Pereira dos Santos", tombo: "011", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Francisco Chagas da Silva Moreira", tombo: "012", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Fábio Robson Casara Cavalcante", tombo: "013", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Gabriel Cestari Vilardi", tombo: "014", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Genifer Yani Figueira de Holanda", tombo: "015", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Hilter Gomes Videira", tombo: "016", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Hélio Ortiz", tombo: "017", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Jane Suchett", tombo: "018", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Joao Eloi de Melo", tombo: "019", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Jorge Luiz Heráclito Mattos", tombo: "020", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "José Otávio Valiante", tombo: "021", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "José Rodolfo Dantas de Oliveira Granha", tombo: "022", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Kassia Souza Coelho", tombo: "023", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Kamila Diniz Correia de Araújo", tombo: "024", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Leonora Moreira Fonseca de Souza", tombo: "025", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Luciana Fabiano dos Santos Uchôa", tombo: "026", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Luciana Ribeiro Conz", tombo: "027", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Marcélio Rodrigues Uchôa", tombo: "028", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Márcia Dias dos Santos", tombo: "029", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Mateus da Silva Campos", tombo: "030", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Michela Araújo Ribeiro", tombo: "031", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Maurício Silva de Souza", tombo: "032", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Marília Rodrigues de Assunção", tombo: "033", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Ronaldo de Almeida", tombo: "034", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Rosa Maria de Lima Ribeiro", tombo: "035", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Renato Pinto de Almeida Neto", tombo: "036", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Raone Holanda da Cruz", tombo: "037", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Rosemeire Ferrarezi Valiante", tombo: "038", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Sandra de Almeida", tombo: "039", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Sônia dos Santos", tombo: "040", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Tiago de Oliveira Loiola", tombo: "041", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" },
+            { responsavel: "Zuila Gumarães Cova dos Santos", tombo: "042", descricao: "Bens diversos", caracteristica: "N/A", situacao: "Bom", marcaModelo: "N/A" }
+        ];
+
+        function buscarTombo() {
+            const tomboBuscado = $("#buscaBem").val().trim();
+            const bemEncontrado = bens.find(bem => bem.tombo === tomboBuscado);
+            const resultadosTabela = $("#tbodyResultados");
+            resultadosTabela.empty(); // Limpa resultados anteriores
+
+            if (bemEncontrado) {
+                // Adiciona o bem encontrado à tabela de resultados
+                resultadosTabela.append(`
+                    <tr>
+                        <td>${bemEncontrado.responsavel}</td>
+                        <td>${bemEncontrado.tombo}</td>
+                        <td>${bemEncontrado.descricao}</td>
+                        <td>${bemEncontrado.caracteristica}</td>
+                        <td>${bemEncontrado.situacao}</td>
+                        <td>${bemEncontrado.marcaModelo}</td>
+                    </tr>
+                `);
+            } else {
+                alert("Bem não encontrado.");
+            }
+            
+            return false; // Impede o envio do formulário
+        }
+
+        function filtrarPorServidor() {
+            const nomeServidor = $("#buscaServidor").val().trim().toLowerCase();
+            const resultadosTabela = $("#tbodyResultados").find("tr");
+            resultadosTabela.each(function() {
+                const responsavel = $(this).find("td").eq(0).text().toLowerCase();
+                if (responsavel.includes(nomeServidor)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function openTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab[onclick="openTab('${tabId}')"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('d-none'));
+            document.getElementById(tabId).classList.remove('d-none');
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
